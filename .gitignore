@@ -1,0 +1,10 @@
+.DS_Store
+*.xlsx
+*.csv
+*.zip
+*.pdf
+Datasets/
+output/
+Schriftliche_Abgabe/*
+!Schriftliche_Abgabe/main.tex
+!Schriftliche_Abgabe/sample.bib
