@@ -25,21 +25,18 @@ Your abstract.
 
 \section{Introduction}
 The following paper presents my findings from the project that I conducted in the scope of the lecture 'Advanced Machine Learning'.
-I used the conducted experiments in \cite{CMBS-Paper} as a baseline to predict the \textcolor{red}{default rates of commercially mortgage-backed securites} using explainable artificial intelligence (XAI) and contrasted the corresponding results.
-\textcolor{red}{The goal was to show that XAI can be effectivly used to conduct experiments}.
-First, I will summarize the underlying paper \cite{CMBS-Paper}. Furthermore, I will introduce my approach to predict the \textcolor{red}{default rates} using XAI, giving an overview of the three algorithms that I used in this context. After that, I will present the results of the three approaches, contrast them and also validate the results.
+I used the conducted experiments in \cite{CMBS-Paper} as a baseline to predict the \textcolor{red}{distress of commercially mortgage-backed securites} using explainable artificial intelligence (XAI) and contrasted the corresponding results.
+According to \textcolor{red}{CITATION NEEDED} financial distress is a term used to indicates a condition in which a company or individual cannot generate sufficient revenues or income, making it unable to meet or pay its financial obligations. 
+%(https://www.investopedia.com/terms/f/financial_distress.asp) 
+\textcolor{red}{The goal of this project was to show that XAI can be effectivly used to conduct experiments}.
+First, I will summarize the underlying paper \cite{CMBS-Paper}. Furthermore, I will introduce my approach to predict if the asset is \textcolor{red}{overstated or not} using XAI, giving an overview of the three algorithms that I used in this context. After that, I will present the results of the three approaches, contrast them and also validate the results.
 \textcolor{red}{Finally, summarize my project by highlighting pros and cons}.
-
 
 \section{Literature Review}
 Commercial mortgage-backed securites are financial instruments which allow investors to trade financial assets that are backed with housing mortgages. 
-In \cite{CMBS-Paper} Griffin and Priest conducted several \textcolor{red}{studies?} 
-to research if the current implemented designs to value Commercial mortgage-backed securites are sufficient
-or if the stress test posed by the pandemic revealed shortcomings of the implemented measures.
-They are mainly concerned about the question wether  
-
-
-Presentation of paper
+In \cite{CMBS-Paper} Griffin and Priest presented a study to reasearch the impact of COVID-19 on commercial mortgage-backed securities (CMBS) and to identify differences in underwriting standards across originators.
+In order to achieve this, the authors analyzed data on income overstatement in CMBS 2.0 deals, and examined its relationship with loan distress and other loan characteristics.
+They found that originator-specific differences in income overstatement were related to loan distress, and that pre-COVID underwriting quality played a large role in the ability of assets to withstand distress. The authors concluded that recent market stresses revealed large systemic differences in underwriting standards across originators, and that originator income overstatement was highly predictive of pre- and COVID-period loan distress.
 
 \section{Methodical Setup}
 This section presents the methodical setup of my experiments, first by shortly introducing the concept of XAI and second by introducing the theoretical background of the three algorithms that I used in my experiments.
@@ -48,7 +45,7 @@ Whilst traditional machine learning methods like deep neural networks often prov
 However, that process is crucial when the model is supposed to work in an environment in which it is not sufficient to trust that the model is tested enough and covers most corner cases.
 According to \cite{Rudin2019}, there are significant advantages of using inherently interpretable methods over methods that require additional methods that try to explain the black box model.
 A research field that is concerned with this is explainable artificial intelligence (XAI).
-I used XAI in order to find reasonable drivers for the prediction of CMBS defaults.
+I used XAI in order to find reasonable drivers for the prediction of CMBS overstatement.
 The following sections present the three methods that I used and describe the theoretical background.
 
 \subsection{Explainable Boosting Machine}
