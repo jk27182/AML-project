@@ -1,3 +1,6 @@
+.venv/
+*.pickle
+*.lock
 .DS_Store
 *.xlsx
 *.csv
