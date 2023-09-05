@@ -102,7 +102,11 @@ def objective(trial, clf_type, X, y):
         penalty = trial.suggest_categorical("penalty", ["elasticnet", "l2", 'l1'])
         C = trial.suggest_float("C", 0.001, 2, step=0.5)
         class_weight = trial.suggest_categorical('class_weight', ['balanced', None])
-        solver = trial.suggest_categorical('solver', ['newton-cholesky', 'lbfgs'])
+        max_iter = trial.suggest_int('max_iter', 500, 1000, step=100)
+        if penalty == 'elasticnet' or penalty == 'l1':
+            solver = 'saga'
+        else:
+            solver = trial.suggest_categorical('solver', ['newton-cholesky', 'lbfgs', 'newton-cg'])
 
         model_name = "LogisticRegression"
         clf = LogisticRegression(
@@ -143,14 +147,32 @@ def objective(trial, clf_type, X, y):
 
 # current best 0.54
 # study_ebm = optuna.create_study(storage="mysql://root@localhost/ebm",direction='maximize', study_name='EBM_study')
-optuna.delete_study(storage="mysql://root@localhost/ebm", study_name='EBM_study')
-study_ebm = optuna.create_study(direction='maximize', storage="mysql://root@localhost/ebm", study_name='EBM_study')
+# optuna.delete_study(storage="mysql://root@localhost/ebm", study_name='EBM_study')
+study_ebm = optuna.create_study(
+    direction='maximize',
+    # storage="mysql://root@localhost/ebm",
+    study_name='EBM_study'
+)
 print('test succesful')
 objective_edm = partial(objective, clf_type='EBM', X=X.head(50), y=y.head(50))
 study_ebm.optimize(objective_edm, n_trials=2, show_progress_bar=True)
 
+best_params_ebm = study_ebm.best_params
+best_ebm_value = study_ebm.best_value
+with open('model/best_params_ebm.pickle', 'wb') as file:
+    pickle.dump({'params':best_params_ebm, 'value':best_ebm_value}, file)
+
 # no current best
-optuna.delete_study(storage="mysql://root@localhost/logreg", study_name='LogisticRegression_study')
-study_LR = optuna.create_study(direction='maximize', storage="mysql://root@localhost/logreg", study_name='LogisticRegression_study')
+# optuna.delete_study(storage="mysql://root@localhost/logreg", study_name='LogisticRegression_study')
+study_LR = optuna.create_study(
+    direction='maximize',
+    # storage="mysql://root@localhost/logreg",
+    study_name='LogisticRegression_study'
+)
 objective_LR = partial(objective, clf_type='LogisticRegression', X=X.head(50), y=y.head(50))
-study_LR.optimize(objective_LR, n_trials=1, show_progress_bar=True)
+study_LR.optimize(objective_LR, n_trials=50, show_progress_bar=True)
+
+best_params_LR = study_LR.best_params
+best_LR_value = study_LR.best_value
+with open('model/best_params_LR.pickle', 'wb') as file:
+    pickle.dump({'params':best_params_LR, 'value':best_LR_value}, file)
