@@ -13,6 +13,7 @@ openpyxl = "^3.1.2"
 imbalanced-learn = "^0.11.0"
 nam = "^0.0.3"
 tensorboard = "^2.14.0"
+optuna = "^3.3.0"
 
 
 [build-system]

@@ -25,12 +25,17 @@ Your abstract.
 
 \section{Introduction}
 The following paper presents my findings from the project that I conducted in the scope of the lecture 'Advanced Machine Learning'.
+I extended the experiments conducted by the authors of \cite{CMBS-Paper}, which used linear and instrumental variable regression techniques with different levels of fixed effects by using explainable artificial intelligence (XAI) on a selected group of experiments.
+The goal is show that XAI is not only a powerful framework to conduct predctions, but is also a valid alternative to common approaches from econometrics in terms of explainability.
+The scope of this project is restricted to the experiments that were conducted 
+First, I will summarize the underlying paper \cite{CMBS-Paper}. Furthermore, I will introduce my approach to classify if a cloan is \textcolor{red}{overstated or not} using XAI, giving an overview of the three algorithms that I used in this context. After that, I will present the results of the three approaches, contrast them and also validate the results.
+\textcolor{red}{Finally, summarize my project by highlighting pros and cons}.
+
+
 I used the conducted experiments in \cite{CMBS-Paper} as a baseline to predict the \textcolor{red}{distress of commercially mortgage-backed securites} using explainable artificial intelligence (XAI) and contrasted the corresponding results.
 According to \textcolor{red}{CITATION NEEDED} financial distress is a term used to indicates a condition in which a company or individual cannot generate sufficient revenues or income, making it unable to meet or pay its financial obligations. 
 %(https://www.investopedia.com/terms/f/financial_distress.asp) 
 \textcolor{red}{The goal of this project was to show that XAI can be effectivly used to conduct experiments}.
-First, I will summarize the underlying paper \cite{CMBS-Paper}. Furthermore, I will introduce my approach to predict if the asset is \textcolor{red}{overstated or not} using XAI, giving an overview of the three algorithms that I used in this context. After that, I will present the results of the three approaches, contrast them and also validate the results.
-\textcolor{red}{Finally, summarize my project by highlighting pros and cons}.
 
 \section{Literature Review}
 In \cite{CMBS-Paper} Griffin and Priest presented a study to reasearch the impact of COVID-19 on commercial mortgage-backed securities (CMBS) and to identify differences in underwriting standards across originators.
@@ -72,7 +77,9 @@ g(E(y)) = \beta_0 + \sum_{i=1}^{m} h_i(x_i) = \beta_0 + h_1(x_1) + h_2(x_2) + \d
 with $h_i, i \in \{1,\dots, m\}$ are the corresponding neural networks.
 Similar to the EBM, the interpretability can be achieved by looking at the neural network, namely its parametrization, for a corresponding variable. \cite{nazemi2022interpretable}
 \section{Experiments}
+In this section I will give a short introduction into the data that I used and the methodical setup to train the three models. Furthermore, I will go into detail about the challenges that I encountered during the training process and highlight design decision in the training process.
 \subsection{Experimental Setup}
+Since the goal of this project is to predict wether or not a loan can be classified as 'distress', which is defined by the authors from \cite{CMBS-Paper} as a binary variable if a loan appears on a servicer's watchlist or becomes non-perfomring from April 2020 to April 2021, I started out by 
 InterpretML \cite{InterpretML}, NAM library \cite{NAM-Library1, NAM-Library2}
 
 % \begin{table}
