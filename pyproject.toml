@@ -14,6 +14,7 @@ imbalanced-learn = "^0.11.0"
 nam = "^0.0.3"
 tensorboard = "^2.14.0"
 optuna = "^3.3.0"
+mysqlclient = "^2.2.0"
 
 
 [build-system]
