@@ -160,8 +160,8 @@ study_ebm.optimize(objective_edm, n_trials=2, show_progress_bar=True)
 
 best_params_ebm = study_ebm.best_params
 best_ebm_value = study_ebm.best_value
-with open('model/best_params_ebm.pickle', 'wb') as file:
-    pickle.dump({'params':best_params_ebm, 'value':best_ebm_value}, file)
+with open('model/best_params_ebm.joblib', 'wb') as file:
+    joblib.dump({'params':best_params_ebm, 'value':best_ebm_value}, file)
 
 # no current best
 # optuna.delete_study(storage="mysql://root@localhost/logreg", study_name='LogisticRegression_study')
@@ -175,5 +175,5 @@ study_LR.optimize(objective_LR, n_trials=50, show_progress_bar=True)
 
 best_params_LR = study_LR.best_params
 best_LR_value = study_LR.best_value
-with open('model/best_params_LR.pickle', 'wb') as file:
-    pickle.dump({'params':best_params_LR, 'value':best_LR_value}, file)
+with open('model/best_params_LR.joblib', 'wb') as file:
+    joblib.dump({'params':best_params_LR, 'value':best_LR_value}, file)
