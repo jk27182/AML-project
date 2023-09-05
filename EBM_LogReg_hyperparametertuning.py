@@ -114,7 +114,8 @@ def objective(trial, clf_type, X, y):
             penalty=penalty,
             C=C,
             class_weight=class_weight,
-            solver=solver
+            solver=solver,
+            max_iter=max_iter
         )
 
     # Use stratified K Fold instead of normal k fold to preserve class imbalance
