@@ -1,6 +1,6 @@
-!src/NAM_testing/Testing_NAM/
+src/NAM_testing/Testing_NAM/
 .swp
-data/	
+**data/
 .venv/
 *.pickle
 *.lock
