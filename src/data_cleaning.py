@@ -18,15 +18,15 @@ orig_characteristics_columns = [
     'buildingage',
     'CutoffOcc',
     'year_priced',
-    'quarter_type',
+    # 'quarter_type',
     'AmortType',
     # 'MSA',
-    'qy',
+    # 'qy',
     'Size',
 
     'OVER_w',
     'past_over',
-    'high_overstatement2', # is 100% dependent on Over_w, if we predict this we get 100% accuracy
+    # 'high_overstatement2', # is 100% dependent on Over_w, if we predict this we get 100% accuracy
     'Distress',
     #'non_perf'
 ]
@@ -36,6 +36,7 @@ orig_data_with_dummies = pd.get_dummies(
     orig_data,
     columns=[
         'AmortType',
+        'year_priced',
         # 'MSA',
         'type'
     ]

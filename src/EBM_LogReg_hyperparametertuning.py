@@ -20,6 +20,8 @@ from imblearn.under_sampling import RandomUnderSampler
 from imblearn.pipeline import make_pipeline
 
 import optuna
+import ray
+from ray import tune
 
 import interpret
 from interpret.glassbox import ExplainableBoostingClassifier, LogisticRegression
