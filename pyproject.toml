@@ -16,6 +16,7 @@ tensorboard = "^2.14.0"
 optuna = "^3.3.0"
 mysqlclient = "^2.2.0"
 ray = {extras = ["tune"], version = "^2.6.3"}
+torchmetrics = "^1.1.1"
 
 
 [build-system]
