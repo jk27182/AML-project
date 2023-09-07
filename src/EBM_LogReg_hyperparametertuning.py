@@ -170,34 +170,36 @@ def objective(trial, clf_type, X, y):
 # study_ebm = optuna.create_study(storage="mysql://root@localhost/ebm",direction='maximize', study_name='EBM_study')
 # optuna.delete_study(storage="mysql://root@localhost/ebm", study_name='EBM_study')
 n_trials = 25
-
 if sys.argv[1] == 'ebm':
+    # direction = 'maximimize'
+    direction = 'minimize'
     study_ebm = optuna.create_study(
-        direction='maximize',
+        direction=direction,
         # storage="mysql://root@localhost/ebm",
         study_name='EBM_study'
     )
-    print('test succesful')
-    objective_edm = partial(objective, clf_type='EBM', X=X.head(50), y=y.head(50))
+    objective_edm = partial(objective, clf_type='EBM', X=X, y=y)
     study_ebm.optimize(objective_edm, n_trials=n_trials, show_progress_bar=True)
 
     best_params_ebm = study_ebm.best_params
     best_ebm_value = study_ebm.best_value
-    with open('models/best_params_ebm.joblib', 'wb') as file:
+    with open(f'models/best_params_ebm_{direction}.joblib', 'wb') as file:
         joblib.dump({'params':best_params_ebm, 'value':best_ebm_value}, file)
 
 # no current best
 # optuna.delete_study(storage="mysql://root@localhost/logreg", study_name='LogisticRegression_study')
 if sys.argv[1] == 'LR':
+    # direction = 'maximimize'
+    direction = 'minimize'
     study_LR = optuna.create_study(
-        direction='maximize',
+        direction=direction,
         # storage="mysql://root@localhost/logreg",
         study_name='LogisticRegression_study'
     )
-    objective_LR = partial(objective, clf_type='LogisticRegression', X=X.head(50), y=y.head(50))
+    objective_LR = partial(objective, clf_type='LogisticRegression', X=X, y=y)
     study_LR.optimize(objective_LR, n_trials=n_trials, show_progress_bar=True)
 
     best_params_LR = study_LR.best_params
     best_LR_value = study_LR.best_value
-    with open('models/best_params_LR.joblib', 'wb') as file:
+    with open(f'models/best_params_LR_{direction}.joblib', 'wb') as file:
         joblib.dump({'params':best_params_LR, 'auroc_score':best_LR_value}, file)
