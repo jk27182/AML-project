@@ -1,7 +1,13 @@
+*.cpython-311*
+*.pyc
+*.svg
+*.rtf
+*.png
+*.joblib
+.venv/
 src/NAM_testing/Testing_NAM/
 .swp
 **data/
-.venv/
 *.pickle
 *.lock
 .DS_Store
@@ -14,3 +20,4 @@ output/
 Schriftliche_Abgabe/*
 !Schriftliche_Abgabe/main.tex
 !Schriftliche_Abgabe/sample.bib
+!.venv/lib/python3.11/site-packages/nam/*
