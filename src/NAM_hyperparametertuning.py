@@ -23,7 +23,6 @@ from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.pipeline import make_pipeline
 
-import optuna
 
 from nam.data import NAMDataset
 from nam.config import defaults
@@ -35,6 +34,8 @@ from nam.types import Config
 from nam.utils import parse_args
 from nam.utils import plot_mean_feature_importance
 from nam.utils import plot_nams
+
+import torch
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
@@ -89,8 +90,8 @@ for dummy_col in dummy_cols:
 # Percentage of clean data from whole dataset
 print('percentage of clean data and all data ', len(clean_data) / len(orig_data_with_dummies))
 
-y = clean_data[target_col].head(100)
-X = clean_data.drop(columns=target_col).head(100)
+y = clean_data[target_col]
+X = clean_data.drop(columns=target_col)
 
 sample_size = len(y)
 print('sample size ', sample_size)
@@ -100,21 +101,16 @@ feature_cols = X.columns
 X['Distress'] = y
 config.wandb = False
 config.num_workers = 4
-config.cross_val = False
+config.cross_val = True
+config.num_folds = 2
+config.batch_size = 512
 
 def objective(cfg):
-     # hyperparams = {
-     #      "lr": trial.suggest_float("lr", 1e-4, 1e-1, log=True),
-     #      "l2_regularization": trial.suggest_float("l2_regularization", 0.01, 1.0, log=True),
-     #      "output_regularization": trial.suggest_float("output_regularization", 0.01, 1.0, log=True),
-     #      "dropout": trial.suggest_float("dropout", 0.01, 1.0, log=True),
-     #      "feature_dropout": trial.suggest_float("feature_dropout", 0.01, 1.0, log=True),
-     #      "batch_size": trial.suggest_categorical("batch_size", [128, 512, 1024]),
-     #      "hidden_sizes": trial.suggest_categorical("hidden_sizes", [[],[32], [64, 32]])
-     # }
-     config.update(**cfg)
+     params = cfg['params']
+     print(params)
+     config.update(**params)
      print(config)
-     nam_dataset = NAMDataset(
+     nam_dataset = FoldedDataset(
           config,
           data_path=X,
           features_columns=feature_cols,
@@ -153,70 +149,52 @@ def objective(cfg):
                logger=tb_logger,
                max_epochs=config.num_epochs,
                callbacks=checkpoint_callback,
+               log_every_n_steps=25
           )
           trainer.fit(
                litmodel,
                train_dataloaders=train_loader,
                val_dataloaders=val_loader)
-          print('=-----------------=============')
-          print('Callback metrics')
           tmp_auroc = trainer.callback_metrics['AUROC_metric'].item()
           scores.append(tmp_auroc)
 
      return {'loss' :np.mean(scores)}
 
-n_trials = 1
-# if sys.argv[1] == 'max':
-#      direction = 'maximize'
-# if sys.argv[1] == 'min':
-#      direction = 'minimize'
-
-# study_nam = optuna.create_study(
-#      direction=direction,
-#      # storage="mysql://root@localhost/nam",
-#      study_name='nam_study'
-# )
-# study_nam.optimize(objective, n_trials=n_trials, show_progress_bar=True)
-# best_params_nam = study_nam.best_params
-# best_nam_value = study_nam.best_value
-# with open(f'models/best_params_nam_{direction}.joblib', 'wb') as file:
-#      joblib.dump({'params':best_params_nam, 'value':best_nam_value}, file)
-# If you
+n_trials = 20
 param_space = {
      'params': {
-          # "lr": tune.loguniform(1e-4, 1e-1),
-          # "l2_regularization": tune.loguniform(0.01, 1.0),
-          # "output_regularization": tune.loguniform(0.01, 1.0),
-          # "dropout": tune.loguniform(0.01, 1.0),
-          # "feature_dropout": tune.loguniform(0.01, 1.0),
-          # "batch_size": tune.choice([128, 512, 1024]),
-          # "hidden_sizes": tune.choice([[], [32], [64, 32]]),
-          "num_epochs": tune.choice([1])
+          "lr": tune.loguniform(1e-4, 1e-1),
+          "l2_regularization": tune.loguniform(0.01, 1.0),
+          "output_regularization": tune.loguniform(0.01, 1.0),
+          "dropout": tune.loguniform(0.01, 1.0),
+          "feature_dropout": tune.loguniform(0.01, 1.0),
+          "batch_size": tune.choice([128, 512, 1024]),
+          "hidden_sizes": tune.choice([[], [32], [64, 32]]),
+          "num_epochs": tune.choice([10, 25])
      }
      } 
-trainable_with_resources = tune.with_resources(objective, {"cpu": 4})
+trainable_with_resources = tune.with_resources(objective, {"cpu": 8})
 tuner = tune.Tuner(
     trainable_with_resources,
     param_space=param_space,
-    tune_config=tune.TuneConfig(num_samples=10),
-    run_config=ray.air.RunConfig(name="my_tune_run")
+    tune_config=tune.TuneConfig(num_samples=n_trials),
+    run_config=ray.air.RunConfig(
+         name="NAM_hyperparameter_run",
+         storage_path='/Users/janik/Documents/Master/KIT/Semester4/Advanced_Machine_Learning_Projekt/models/ray_results'
+     )
 )
 results = tuner.fit()
-# result = tune.run(
-#     objective,
-#     num_samples=n_trials,
-#     metric="loss",
-#     mode="min",
-#     ,
-#     resources_per_trial={"cpu": 4}, 
-#     storage_path="/Users/janik/Documents/Master/KIT/Semester 4/Advanced Machine Learning Projekt/models/ray_results",  
-#     name="NAM",  
-#     verbose=1  
-# )
-# tuner.fit()
-best_trial = results.get_best_trial("loss", "min", "last")
-best_loss = best_trial.last_result['loss']
-best_config = best_trial.config
-print(f"Best trial config: {best_trial.config}")
-print(f"Best trial final validation loss: {best_trial.last_result['loss']}")
-print(f"Best trial final validation accuracy: {best_trial.last_result['accuracy']}")
+
+best_min_trial = results.get_best_result(metric="loss", mode="min", scope="all")
+best_max_trial = results.get_best_result(metric="loss", mode="max", scope="all")
+
+best_min_config = best_min_trial.config
+best_max_config = best_max_trial.config
+print(f"Best min trial config: {best_min_trial.config}")
+print(f"Best max trial config: {best_max_trial.config}")
+
+with open('models/best_params_nam_minimize.joblib', 'wb') as file:
+     joblib.dump(best_min_config, file)
+
+with open('models/best_params_nam_maximize.joblib', 'wb') as file:
+     joblib.dump(best_max_config, file)
