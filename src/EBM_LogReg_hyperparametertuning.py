@@ -1,28 +1,19 @@
 import sys
-from pathlib import Path
-from IPython.display import display
 from functools import partial
 import pickle
 import time
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from tqdm.auto import tqdm
 
 import joblib
 
-from sklearn.model_selection import train_test_split, cross_validate, StratifiedKFold
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, recall_score, accuracy_score, precision_score, roc_auc_score
-from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import roc_auc_score
 
 from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.pipeline import make_pipeline
 
 import optuna
-import ray
-from ray import tune
 
 import interpret
 from interpret.glassbox import ExplainableBoostingClassifier, LogisticRegression
@@ -34,7 +25,6 @@ with open('data/all_data.pickle', 'rb') as file:
 
 orig_characteristics = all_data['OrigCharacteristics.dta']
 orig_characteristics_columns = [
-    #'Deal',
     'type',
     'CutoffLTV',
     'CutoffDSCR',
@@ -43,18 +33,13 @@ orig_characteristics_columns = [
     'fixed',
     'buildingage',
     'CutoffOcc',
-    'year_priced',
     'quarter_type',
     'AmortType',
-    # 'MSA',
-    # 'qy',
     'Size',
-
     'OVER_w',
     'past_over',
-    'high_overstatement2', # is 100% dependent on Over_w, if we predict this we get 100% accuracy
+    'high_overstatement2',
     'Distress',
-    #'non_perf'
 ]
 orig_data = orig_characteristics[orig_characteristics_columns]
 target_col = 'Distress'
@@ -62,9 +47,7 @@ orig_data_with_dummies = pd.get_dummies(
     orig_data,
     columns=[
         'AmortType',
-        # 'MSA',
         'type',
-        'year_priced'
     ]
 )
 clean_data = orig_data_with_dummies[
@@ -83,7 +66,7 @@ X = clean_data.drop(columns=target_col)
 
 sample_size = len(y)
 print('sample size ', sample_size)
-# global_res_models = {'EBM': {'score': [], 'models': [], 'fold': []}, 'LogisticRegression': {'score': [], 'models': [], 'fold': []}}
+
 # objective for optuna hyperparameter search
 def objective(trial, clf_type, X, y):
     res = {
@@ -166,7 +149,6 @@ def objective(trial, clf_type, X, y):
     # global_res_models.update({model_name: res})
     return np.mean(auc_roc)
 
-# current best 0.54
 # study_ebm = optuna.create_study(storage="mysql://root@localhost/ebm",direction='maximize', study_name='EBM_study')
 # optuna.delete_study(storage="mysql://root@localhost/ebm", study_name='EBM_study')
 n_trials = 25

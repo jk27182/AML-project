@@ -1,41 +1,20 @@
-import sys
-from pathlib import Path
-from IPython.display import display
-from functools import partial
 import pickle
-import time
 import datetime
                                                                            
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from tqdm.auto import tqdm
+
 
 import joblib
 import ray
 from ray import tune
 
-from sklearn.model_selection import train_test_split, cross_validate, StratifiedKFold
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, recall_score, accuracy_score, precision_score, roc_auc_score
-from sklearn.preprocessing import LabelEncoder
-
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.pipeline import make_pipeline
-
-
-from nam.data import NAMDataset
+from nam.data import NAMDataset, FoldedDataset
 from nam.config import defaults
-from nam.data import FoldedDataset
 from nam.models import NAM
 from nam.models import get_num_units
 from nam.trainer import LitNAM
-from nam.types import Config
-from nam.utils import parse_args
-from nam.utils import plot_mean_feature_importance
-from nam.utils import plot_nams
 
-import torch
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
@@ -46,7 +25,6 @@ with open('data/all_data.pickle', 'rb') as file:
 
 orig_characteristics = all_data['OrigCharacteristics.dta']
 orig_characteristics_columns = [
-    #'Deal',
     'type',
     'CutoffLTV',
     'CutoffDSCR',
@@ -55,18 +33,13 @@ orig_characteristics_columns = [
     'fixed',
     'buildingage',
     'CutoffOcc',
-    'year_priced',
     'quarter_type',
     'AmortType',
-    # 'MSA',
-    # 'qy',
     'Size',
-
     'OVER_w',
     'past_over',
-    'high_overstatement2', # is 100% dependent on Over_w, if we predict this we get 100% accuracy
+    'high_overstatement2',
     'Distress',
-    #'non_perf'
 ]
 orig_data = orig_characteristics[orig_characteristics_columns]
 target_col = 'Distress'
@@ -74,9 +47,7 @@ orig_data_with_dummies = pd.get_dummies(
     orig_data,
     columns=[
         'AmortType',
-        # 'MSA',
         'type',
-        'year_priced'
     ]
 )
 clean_data = orig_data_with_dummies[

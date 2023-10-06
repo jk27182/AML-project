@@ -20,6 +20,7 @@ torchmetrics = "^1.1.1"
 ipywidgets = "^8.1.0"
 torcheval = "^0.0.7"
 seaborn = "^0.12.2"
+kaleido = "0.2.1"
 
 
 [build-system]
